@@ -28,6 +28,10 @@ import java.awt.BorderLayout;
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.JToolBar;
+
+import org.polly.query.log.queries.IQuery;
+import org.polly.query.log.queries.QueryFactory;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
@@ -112,7 +116,7 @@ public class QueryLogMainWindow {
 				continue;
 			}
 
-			IQuery query = new BaseQuery();
+			IQuery query = QueryFactory.getInstance().getQuery();
 			query.setQuery(queryString);
 			queries.add(query);
 		}
@@ -134,14 +138,12 @@ public class QueryLogMainWindow {
 				}
 
 				if (queries.size() == 0) {
-					recordNumber = addLineToResult(recordNumber, line,
-							recordList, logFile, lineNumber);
+					recordNumber = addLineToResult(recordNumber, line, recordList, logFile, lineNumber);
 				}
 
 				for (IQuery query : queries) {
 					if (query.match(line)) {
-						recordNumber = addLineToResult(recordNumber, line,
-								recordList, logFile, lineNumber);
+						recordNumber = addLineToResult(recordNumber, line, recordList, logFile, lineNumber);
 						break;
 					}
 				}
@@ -155,19 +157,16 @@ public class QueryLogMainWindow {
 			br.close();
 
 			fileManaged++;
-			progressBar.setValue((int) ((double) fileManaged
-					/ (double) logFolder.listFiles().length * 100.0));
+			progressBar.setValue((int) ((double) fileManaged / (double) logFolder.listFiles().length * 100.0));
 
 			// Force GUI update of progress bar
-			progressBar.paintImmediately(0, 0, frmQuerylog.getWidth(),
-					frmQuerylog.getHeight());
+			progressBar.paintImmediately(0, 0, frmQuerylog.getWidth(), frmQuerylog.getHeight());
 		}
 
 		listLogs.setModel(new MyListModel<Record>(recordList));
 	}
 
-	private int addLineToResult(int recordNumber, String line,
-			List<Record> recordList, File file, int lineNumber) {
+	private int addLineToResult(int recordNumber, String line, List<Record> recordList, File file, int lineNumber) {
 		recordList.add(new Record(file, lineNumber, line));
 		recordNumber++;
 		return recordNumber;
@@ -226,7 +225,7 @@ public class QueryLogMainWindow {
 		txtpnQuerypanel = new JTextPane();
 		txtpnQuerypanel.setFont(new Font("Courier New", Font.PLAIN, 11));
 		scrollPane.setViewportView(txtpnQuerypanel);
-		
+
 		JLabel lblQuery = new JLabel("Query:");
 		scrollPane.setRowHeaderView(lblQuery);
 
