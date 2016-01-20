@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import javax.swing.AbstractListModel;
 import javax.swing.JList;
 import javax.swing.JToolBar;
+import javax.swing.UIManager;
 
 import org.polly.query.log.queries.IQuery;
 import org.polly.query.log.queries.QueryFactory;
@@ -89,6 +90,8 @@ public class QueryLogMainWindow {
 			@Override
 			public void run() {
 				try {
+					UIManager.setLookAndFeel(
+				            UIManager.getSystemLookAndFeelClassName());
 					QueryLogMainWindow window = new QueryLogMainWindow();
 					window.frmQuerylog.setVisible(true);
 				} catch (Exception e) {
@@ -185,7 +188,7 @@ public class QueryLogMainWindow {
 		JToolBar toolBar = new JToolBar();
 		frmQuerylog.getContentPane().add(toolBar, BorderLayout.NORTH);
 
-		JLabel lblFolder = new JLabel("Folder");
+		JLabel lblFolder = new JLabel("Log Folder");
 		toolBar.add(lblFolder);
 
 		txtLogfolder = new JTextField();
@@ -213,21 +216,24 @@ public class QueryLogMainWindow {
 				}
 			}
 		});
-		toolBar.add(btnQuery);
 
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		frmQuerylog.getContentPane().add(splitPane, BorderLayout.CENTER);
 
 		JScrollPane scrollPane = new JScrollPane();
+		JPanel queryPanel = new JPanel();
+		scrollPane.setViewportView(queryPanel);
 		splitPane.setLeftComponent(scrollPane);
-
+		queryPanel.setLayout(new BorderLayout());
+		
 		txtpnQuerypanel = new JTextPane();
 		txtpnQuerypanel.setFont(new Font("Courier New", Font.PLAIN, 11));
-		scrollPane.setViewportView(txtpnQuerypanel);
+		queryPanel.add(txtpnQuerypanel,  BorderLayout.CENTER);
 
 		JLabel lblQuery = new JLabel("Query:");
-		scrollPane.setRowHeaderView(lblQuery);
+		queryPanel.add(lblQuery,  BorderLayout.WEST);
+		queryPanel.add(btnQuery,  BorderLayout.EAST);
 
 		JPanel panelNoWrap = new JPanel();
 		panelNoWrap.setLayout(new BorderLayout());
