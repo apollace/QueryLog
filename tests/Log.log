@@ -1,0 +1,12 @@
+2016-01-01 22:01:33     THREAD_1   Program say: HELLO World
+2016-01-01 22:01:33     THREAD_1   Program say: HELLO WORLD
+2016-01-01 22:01:33     THREAD_1   Program say: Hello World
+2016-01-01 22:01:33     THREAD_2   Program say: Follow this thread up to "Stop follow me"
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
+2016-01-01 22:01:33     THREAD_2   Program say: Right way boy
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
+2016-01-01 22:01:33     THREAD_2   Program say: Stop follow me
+2016-01-01 22:01:33     THREAD_1   Program say: I'm a garbage message
