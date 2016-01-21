@@ -145,7 +145,7 @@ public class QueryLogMainWindow {
 				}
 
 				for (IQuery query : queries) {
-					if (query.match(line)) {
+					if (query.match(line.getBytes())) {
 						recordNumber = addLineToResult(recordNumber, line, recordList, logFile, lineNumber);
 						break;
 					}

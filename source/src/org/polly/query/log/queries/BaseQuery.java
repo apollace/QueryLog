@@ -121,7 +121,8 @@ public class BaseQuery implements IQuery {
 	}
 
 	@Override
-	public boolean match(String line) {
+	public boolean match(byte[] bytes) {
+		String line = new String(bytes);
 		if (query.queryStr != null) {
 			if (query.queryRegEx == null) {
 				if (lineMatch(query.queryStr, line)) {

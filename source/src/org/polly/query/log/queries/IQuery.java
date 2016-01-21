@@ -49,11 +49,11 @@ public interface IQuery {
 	 * This method verify if the current line match with the user query and
 	 * previous log records.
 	 * 
-	 * @param line
-	 *            the current line of file;
+	 * @param bytes
+	 *            the current log record
 	 * 
 	 * @return <code>true</code> if the current line matches, <code>false</code>
 	 *         otherwise.
 	 */
-	public boolean match(String line);
+	public boolean match(byte[] bytes);
 }
