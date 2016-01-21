@@ -44,7 +44,7 @@ public interface IReader {
 		 *            <code>true</code> if this buffer is the last read buffer,
 		 *            <code>false</code> otherwise.
 		 */
-		public void onData(Byte[] bytes, boolean isLast);
+		public void onData(byte[] bytes, boolean isLast);
 
 		/**
 		 * This method is used to communicate the advancement percentage, if it

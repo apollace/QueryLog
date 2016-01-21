@@ -1,0 +1,108 @@
+/**
+ * This file belonging to QueryLog an open source tool to search and trace
+ * information contained in your logs.  
+ * Copyright (C) 2016  Alessandro Pollace
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.polly.query.log.reader;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+/**
+ * This class implements the {@link IReader} interface to read the log files
+ * contained in a single folder. The files will be reader in alphabetical order
+ * one by one.
+ * 
+ * @author Alessandro Pollace
+ */
+public class FileReader implements IReader {
+	private volatile boolean isRun = false;
+	private File rootDirectory = null;
+
+	/**
+	 * This method is the main function of reader thread.
+	 * 
+	 * @param callbak
+	 *            instance of {@link ICallback} used to send back the results
+	 * @throws FileNotFoundException
+	 */
+	private void threadMain(ICallback callbak) throws IOException {
+		File[] logFiles = rootDirectory.listFiles();
+		int filesNumber = logFiles.length;
+		int currentFileIndex = 0;
+		while (isRun || currentFileIndex < filesNumber) {
+			BufferedReader br = new BufferedReader(new java.io.FileReader(logFiles[currentFileIndex]));
+
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				callbak.onData(line.getBytes(), false);
+			}
+
+			br.close();
+
+			double percentage = (double) currentFileIndex / (double) filesNumber * 100;
+			callbak.onProgressChange((int) percentage);
+		}
+	}
+
+	@Override
+	public void init(String url) throws IOException {
+		synchronized (rootDirectory) {
+			rootDirectory = new File(url);
+			if (!rootDirectory.exists() || !rootDirectory.isDirectory()) {
+				rootDirectory = null;
+				throw new IOException("URL does not represent a valid folder path");
+			}
+		}
+	}
+
+	@Override
+	public void clear() {
+		synchronized (rootDirectory) {
+			rootDirectory = null;
+		}
+	}
+
+	@Override
+	public void start(final ICallback callback) {
+		synchronized (rootDirectory) {
+			if (rootDirectory == null) {
+				return;
+			}
+		}
+
+		// Start the reading in a new thread
+		new Thread() {
+			public void run() {
+				synchronized (rootDirectory) {
+					try {
+						threadMain(callback);
+					} catch (IOException e) {
+						FileReader.this.stop();
+					}
+				}
+			};
+		}.start();
+	}
+
+	@Override
+	public void stop() {
+		isRun = false;
+	}
+
+}
