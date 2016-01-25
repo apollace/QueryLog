@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
+import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 public class QueryBuilder extends JFrame {
@@ -41,7 +42,7 @@ public class QueryBuilder extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					QueryBuilder frame = new QueryBuilder();
+					JFrame frame = new JFrame();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -60,24 +61,25 @@ public class QueryBuilder extends JFrame {
 		contentPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
+
 		JPanel panel = new JPanel();
 		contentPane.setLeftComponent(panel);
 		panel.setLayout(new BorderLayout(0, 0));
-		
+
 		JScrollPane scrollPane = new JScrollPane();
 		panel.add(scrollPane, BorderLayout.CENTER);
-		
+
 		JTextPane txtpnQuery = new JTextPane();
 		scrollPane.setViewportView(txtpnQuery);
-		
+
 		JLabel lblQuery = new JLabel("Query");
 		panel.add(lblQuery, BorderLayout.WEST);
-		
+
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBorder(new TitledBorder(null, "Insert your test log here", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		scrollPane_1.setBorder(new TitledBorder(null, "Insert your test log here", TitledBorder.LEADING,
+				TitledBorder.TOP, null, null));
 		contentPane.setRightComponent(scrollPane_1);
-		
+
 		JTextPane txtpnLogSample = new JTextPane();
 		scrollPane_1.setViewportView(txtpnLogSample);
 	}

@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import sun.awt.Mutex;
+
 /**
  * This class implements the {@link IReader} interface to read the log files
  * contained in a single folder. The files will be reader in alphabetical order
@@ -32,6 +34,8 @@ import java.io.IOException;
  */
 public class FileReader implements IReader {
 	private volatile boolean isRun = false;
+
+	final Mutex mutex = new Mutex();
 	private File rootDirectory = null;
 
 	/**
@@ -54,50 +58,55 @@ public class FileReader implements IReader {
 			}
 
 			br.close();
+			currentFileIndex++;
 
 			double percentage = (double) currentFileIndex / (double) filesNumber * 100;
 			callbak.onProgressChange((int) percentage);
 		}
+		isRun = false;
 	}
 
 	@Override
 	public void init(String url) throws IOException {
-		synchronized (rootDirectory) {
-			rootDirectory = new File(url);
-			if (!rootDirectory.exists() || !rootDirectory.isDirectory()) {
-				rootDirectory = null;
-				throw new IOException("URL does not represent a valid folder path");
-			}
+		mutex.lock();
+		rootDirectory = new File(url);
+		if (!rootDirectory.exists() || !rootDirectory.isDirectory()) {
+			rootDirectory = null;
+			mutex.unlock();
+			throw new IOException("URL does not represent a valid folder path");
 		}
+		mutex.unlock();
 	}
 
 	@Override
 	public void clear() {
-		synchronized (rootDirectory) {
-			rootDirectory = null;
-		}
+		mutex.lock();
+		rootDirectory = null;
+		mutex.unlock();
 	}
 
 	@Override
 	public void start(final ICallback callback) {
-		synchronized (rootDirectory) {
-			if (rootDirectory == null) {
-				return;
-			}
+		mutex.lock();
+		if (rootDirectory == null) {
+			mutex.unlock();
+			return;
 		}
+		mutex.unlock();
 
 		// Start the reading in a new thread
 		new Thread() {
 			public void run() {
-				synchronized (rootDirectory) {
-					try {
-						threadMain(callback);
-					} catch (IOException e) {
-						FileReader.this.stop();
-					}
+				mutex.lock();
+				try {
+					threadMain(callback);
+				} catch (IOException e) {
+					FileReader.this.stop();
 				}
+				mutex.unlock();
 			};
 		}.start();
+
 	}
 
 	@Override
