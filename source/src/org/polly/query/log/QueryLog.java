@@ -252,6 +252,17 @@ public class QueryLog {
 		JMenuItem mntmStopQuery = new JMenuItem("Stop query");
 		mntmStopQuery.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		mnQuery.add(mntmStopQuery);
+
+		JMenu menu = new JMenu("?");
+		menuBar.add(menu);
+
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new About().setVisible(true);
+			}
+		});
+		menu.add(mntmAbout);
 	}
 
 }
