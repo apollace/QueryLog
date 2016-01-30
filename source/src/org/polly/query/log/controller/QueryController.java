@@ -112,8 +112,47 @@ public class QueryController {
 		}
 	}
 
+	private class CallbackForSimpleStatement implements ICallback {
+		private static final String DEFAULT_HEADER = "Default";
+
+		@Override
+		public void onData(byte[] bytes, boolean isLast) {
+			StringBuilder currentStringBuilder = null;
+
+			// Check if the current received data match with a new request.
+			if (newQuery.match(bytes)) {
+				// Received data is a new request
+				mutex.lock();
+
+				if ((currentStringBuilder = resultsMapByRequestHeader.get(DEFAULT_HEADER)) == null) {
+					currentStringBuilder = new StringBuilder();
+					resultsMapByRequestHeader.put(DEFAULT_HEADER, currentStringBuilder);
+				}
+
+				mutex.unlock();
+			}
+
+			// Verify if there are some data to add
+			if (currentStringBuilder == null) {
+				// No match found
+				return;
+			}
+
+			// If so add data
+			mutex.lock();
+			currentStringBuilder.append(new String(bytes)).append("\n");
+			mutex.unlock();
+
+		}
+
+		@Override
+		public void onProgressChange(int advancementPercentage) {
+			QueryController.this.advancementPercentage = advancementPercentage;
+		}
+	}
+
 	// This is the instance of callback used to manage the reader callback
-	private Callback callback = new Callback();
+	private ICallback callback = null;
 
 	/**
 	 * Initialize and start the log search
