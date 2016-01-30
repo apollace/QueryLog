@@ -28,9 +28,6 @@ public class QueryFactory {
 	// The unique instance of QueryFactory
 	private static QueryFactory instance = new QueryFactory();
 
-	// Currently only the base query exists, for this reason
-	private IQuery query = new BaseQuery();
-
 	/**
 	 * Hide constructor to prevent the instance creation of this class
 	 */
@@ -39,12 +36,12 @@ public class QueryFactory {
 	}
 
 	/**
-	 * This method is used to return the right query instance
+	 * This method is used to return a query instance
 	 * 
 	 * @return the query instance
 	 */
 	public IQuery getQuery() {
-		return query;
+		return new BaseQuery();
 	}
 
 	/**

@@ -19,6 +19,9 @@
 package org.polly.query.log.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.polly.query.log.queries.IQuery;
 import org.polly.query.log.queries.QueryFactory;
@@ -29,16 +32,21 @@ import org.polly.query.log.reader.IReader.ICallback;
 import sun.awt.Mutex;
 
 /**
+ * This class controls the query flow management. It take care about query
+ * initializations and multiple request management.
  * 
  * @author Alessandro Pollace
  */
 public class QueryController {
-	private IQuery query = QueryFactory.getInstance().getQuery();
 	private IReader reader = new FileReader();
 
 	private final Mutex mutex = new Mutex();
 	private volatile int advancementPercentage = 0;
-	private StringBuilder matchedLinesFromLastTime = new StringBuilder();
+
+	private String strQuery = null;
+	private IQuery newQuery = null;
+	private Map<String, IQuery> queryMapByRequestHeader = new HashMap<String, IQuery>();
+	private Map<String, StringBuilder> resultsMapByRequestHeader = new HashMap<String, StringBuilder>();
 
 	/**
 	 * This is the implementation of {@link ICallback} used to manage the data
@@ -50,11 +58,51 @@ public class QueryController {
 
 		@Override
 		public void onData(byte[] bytes, boolean isLast) {
-			if (!query.match(bytes))
-				return;
+			StringBuilder currentStringBuilder = null;
 
+			// Check if the current received data match with a new request.
+			if (newQuery.match(bytes)) {
+				// Received data is a new request
+				mutex.lock();
+
+				String header = new String(bytes);
+				currentStringBuilder = new StringBuilder();
+				queryMapByRequestHeader.put(header, newQuery);
+				resultsMapByRequestHeader.put(header, currentStringBuilder);
+				newQuery = QueryFactory.getInstance().getQuery();
+				newQuery.setQuery(strQuery);
+
+				mutex.unlock();
+			} else if (true)/*
+							 * Add check to verify if current query is a query
+							 * START/CONTINUE/END statement
+							 */ {
+				// Received data is not a new request
+				// Verify if the received data matches with one of the older
+				// requests
+				mutex.lock();
+				for (String header : queryMapByRequestHeader.keySet()) {
+					if (!queryMapByRequestHeader.get(header).match(bytes)) {
+						continue;
+					}
+
+					// Current data match with an older request
+					currentStringBuilder = resultsMapByRequestHeader.get(header);
+					break;
+				}
+				mutex.unlock();
+
+			}
+
+			// Verify if there are some data to add
+			if (currentStringBuilder == null) {
+				// No match found
+				return;
+			}
+
+			// If so add data
 			mutex.lock();
-			matchedLinesFromLastTime.append(new String(bytes)).append("\n");
+			currentStringBuilder.append(new String(bytes)).append("\n");
 			mutex.unlock();
 		}
 
@@ -64,14 +112,23 @@ public class QueryController {
 		}
 	}
 
+	// This is the instance of callback used to manage the reader callback
 	private Callback callback = new Callback();
 
+	/**
+	 * Initialize and start the log search
+	 * 
+	 * @param query
+	 * @param url
+	 * @return
+	 */
 	public boolean search(String query, String url) {
 		advancementPercentage = 0;
-		matchedLinesFromLastTime = new StringBuilder();
 
 		// Try to set query
-		if (!this.query.setQuery(query)) {
+		strQuery = query;
+		newQuery = QueryFactory.getInstance().getQuery();
+		if (!newQuery.setQuery(strQuery)) {
 			return false;
 		}
 
@@ -87,18 +144,22 @@ public class QueryController {
 		return true;
 	}
 
-	public void stopSearch(){
+	/**
+	 * Stop the query search
+	 */
+	public void stopSearch() {
 		reader.stop();
 	}
 
-	public String getNewMatches() {
-		String newData;
-		mutex.lock();
-		newData = matchedLinesFromLastTime.toString();
-		matchedLinesFromLastTime = new StringBuilder();
-		mutex.unlock();
+	public String[] getRequestsHeader() {
+		Set<String> keys = resultsMapByRequestHeader.keySet();
+		String array[] = new String[keys.size()];
+		array = keys.toArray(array);
+		return array;
+	}
 
-		return newData;
+	public String getRequestContent(String requestHeader) {
+		return resultsMapByRequestHeader.get(requestHeader).toString();
 	}
 
 	public int getAdvancement() {

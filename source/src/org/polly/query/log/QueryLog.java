@@ -25,12 +25,11 @@ import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 import org.polly.query.log.controller.QueryController;
 
 import javax.swing.JScrollPane;
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 
 import javax.swing.JTextPane;
@@ -56,11 +55,20 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import java.awt.GridLayout;
 import javax.swing.JProgressBar;
+import javax.swing.JList;
+import java.awt.Dimension;
+import javax.swing.ListSelectionModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class QueryLog {
+	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
+	JList<String> headers = new JList<String>(headerListModel);
+
+	private JTextPane textPaneResults = new JTextPane();
 	private JFrame frame = null;
+	private JFrame frmQuerylog;
 	private JProgressBar progressBar = new JProgressBar();
-	private JTextPane txtpnQueryResult;
 	private String logPath = "";
 	JLabel lblLogPathView = new JLabel("Plase select a log directory via File menu");
 
@@ -81,7 +89,7 @@ public class QueryLog {
 				try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 					QueryLog window = new QueryLog();
-					window.frame.setVisible(true);
+					window.frmQuerylog.setVisible(true);
 				} catch (Exception e) {
 					new ErrorManager(e).setVisible(true);
 				}
@@ -124,15 +132,13 @@ public class QueryLog {
 	}
 
 	private void startWaitLoop() {
-		String newData = queryController.getNewMatches();
-		if (newData != null && newData.length() > 0) {
-			try {
-				Document doc = txtpnQueryResult.getDocument();
-				doc.insertString(doc.getLength(), newData, null);
-			} catch (BadLocationException exc) {
-				new ErrorManager(exc).setVisible(true);
+		String headers[] = queryController.getRequestsHeader();
+		for (String header : headers) {
+			if (!headerListModel.contains(header)) {
+				headerListModel.addElement(header);
 			}
 		}
+
 		int advancement = queryController.getAdvancement();
 		progressBar.setValue(advancement);
 		if (advancement == 100) {
@@ -151,13 +157,14 @@ public class QueryLog {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 658, 419);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmQuerylog = new JFrame();
+		frmQuerylog.setTitle("QueryLog");
+		frmQuerylog.setBounds(100, 100, 658, 419);
+		frmQuerylog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JSplitPane mainSplitPane = new JSplitPane();
 		mainSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		frame.getContentPane().add(mainSplitPane, BorderLayout.CENTER);
+		frmQuerylog.getContentPane().add(mainSplitPane, BorderLayout.CENTER);
 
 		JPanel queryPanel = new JPanel();
 		queryPanel.setBorder(new TitledBorder(null, "Query", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -187,13 +194,39 @@ public class QueryLog {
 
 		propertyPanel.add(progressBar);
 
-		txtpnQueryResult = new JTextPane();
-		txtpnQueryResult.setFont(new Font("Monospaced", Font.PLAIN, 11));
-		txtpnQueryResult.setEditable(false);
-		mainSplitPane.setRightComponent(txtpnQueryResult);
+		JSplitPane splitPane = new JSplitPane();
+		mainSplitPane.setRightComponent(splitPane);
+
+		JScrollPane scrollPane = new JScrollPane();
+		splitPane.setRightComponent(scrollPane);
+
+		textPaneResults.setFont(new Font("Monospaced", Font.PLAIN, 11));
+		textPaneResults.setEditable(false);
+		scrollPane.setViewportView(textPaneResults);
+
+		JPanel panel = new JPanel();
+		panel.setPreferredSize(new Dimension(200, 10));
+		panel.setBorder(new TitledBorder(null, "Request headers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		splitPane.setLeftComponent(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+
+		JScrollPane scrollPane_2 = new JScrollPane();
+		panel.add(scrollPane_2, BorderLayout.CENTER);
+		headers.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					String content = queryController.getRequestContent(headers.getSelectedValue());
+					textPaneResults.setText(content);
+				}
+			}
+		});
+
+		headers.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollPane_2.setViewportView(headers);
 
 		JMenuBar menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
+		frmQuerylog.setJMenuBar(menuBar);
 
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
@@ -231,6 +264,7 @@ public class QueryLog {
 		JMenuItem mntmRunQuery = new JMenuItem("Run query");
 		mntmRunQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				headerListModel.clear();
 				queryController.search(txtpnQuery.getText(), logPath);
 				startWaitLoop();
 			}
