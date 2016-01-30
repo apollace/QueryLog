@@ -52,7 +52,7 @@ public class QueryController {
 		public void onData(byte[] bytes, boolean isLast) {
 			if (!query.match(bytes))
 				return;
-			
+
 			mutex.lock();
 			matchedLinesFromLastTime.append(new String(bytes)).append("\n");
 			mutex.unlock();
@@ -85,6 +85,10 @@ public class QueryController {
 		// start reader
 		reader.start(callback);
 		return true;
+	}
+
+	public void stopSearch(){
+		reader.stop();
 	}
 
 	public String getNewMatches() {

@@ -83,7 +83,7 @@ public class QueryLog {
 					QueryLog window = new QueryLog();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					new ErrorManager(e).setVisible(true);
 				}
 			}
 		});
@@ -117,8 +117,9 @@ public class QueryLog {
 			out = new FileOutputStream(f);
 			properties.store(out, "Autosaved settings");
 		} catch (FileNotFoundException e) {
-
+			new ErrorManager(e).setVisible(true);
 		} catch (IOException e) {
+			new ErrorManager(e).setVisible(true);
 		}
 	}
 
@@ -129,7 +130,7 @@ public class QueryLog {
 				Document doc = txtpnQueryResult.getDocument();
 				doc.insertString(doc.getLength(), newData, null);
 			} catch (BadLocationException exc) {
-				exc.printStackTrace();
+				new ErrorManager(exc).setVisible(true);
 			}
 		}
 		int advancement = queryController.getAdvancement();
@@ -238,6 +239,11 @@ public class QueryLog {
 		mnQuery.add(mntmRunQuery);
 
 		JMenuItem mntmStopQuery = new JMenuItem("Stop query");
+		mntmStopQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				queryController.stopSearch();
+			}
+		});
 		mntmStopQuery.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
 		mnQuery.add(mntmStopQuery);
 
