@@ -102,7 +102,7 @@ public class QueryController {
 
 			// If so add data
 			mutex.lock();
-			currentStringBuilder.append(new String(data)).append("\n");
+			currentStringBuilder.append(data).append("\n");
 			mutex.unlock();
 		}
 
@@ -140,7 +140,7 @@ public class QueryController {
 
 			// If so add data
 			mutex.lock();
-			currentStringBuilder.append(new String(data)).append("\n");
+			currentStringBuilder.append(data).append("\n");
 			mutex.unlock();
 
 		}
