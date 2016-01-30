@@ -38,13 +38,13 @@ public interface IReader {
 		 * Catch the data read by {@link IReader} implementation. This method
 		 * must be thread safe. It may be called from a different thread.
 		 * 
-		 * @param bytes
+		 * @param data
 		 *            the read data
 		 * @param isLast
 		 *            <code>true</code> if this buffer is the last read buffer,
 		 *            <code>false</code> otherwise.
 		 */
-		public void onData(byte[] bytes, boolean isLast);
+		public void onData(String data, boolean isLast);
 
 		/**
 		 * This method is used to communicate the advancement percentage, if it

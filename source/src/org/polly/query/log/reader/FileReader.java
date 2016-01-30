@@ -54,7 +54,7 @@ public class FileReader implements IReader {
 
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				callbak.onData(line.getBytes(), false);
+				callbak.onData(line, false);
 			}
 
 			br.close();

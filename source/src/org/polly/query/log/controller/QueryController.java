@@ -57,15 +57,15 @@ public class QueryController {
 	private class Callback implements ICallback {
 
 		@Override
-		public void onData(byte[] bytes, boolean isLast) {
+		public void onData(String data, boolean isLast) {
 			StringBuilder currentStringBuilder = null;
 
 			// Check if the current received data match with a new request.
-			if (newQuery.match(bytes)) {
+			if (newQuery.match(data)) {
 				// Received data is a new request
 				mutex.lock();
 
-				String header = new String(bytes);
+				String header = new String(data);
 				currentStringBuilder = new StringBuilder();
 				queryMapByRequestHeader.put(header, newQuery);
 				resultsMapByRequestHeader.put(header, currentStringBuilder);
@@ -82,7 +82,7 @@ public class QueryController {
 				// requests
 				mutex.lock();
 				for (String header : queryMapByRequestHeader.keySet()) {
-					if (!queryMapByRequestHeader.get(header).match(bytes)) {
+					if (!queryMapByRequestHeader.get(header).match(data)) {
 						continue;
 					}
 
@@ -102,7 +102,7 @@ public class QueryController {
 
 			// If so add data
 			mutex.lock();
-			currentStringBuilder.append(new String(bytes)).append("\n");
+			currentStringBuilder.append(new String(data)).append("\n");
 			mutex.unlock();
 		}
 
@@ -116,11 +116,11 @@ public class QueryController {
 		private static final String DEFAULT_HEADER = "Default";
 
 		@Override
-		public void onData(byte[] bytes, boolean isLast) {
+		public void onData(String data, boolean isLast) {
 			StringBuilder currentStringBuilder = null;
 
 			// Check if the current received data match with a new request.
-			if (newQuery.match(bytes)) {
+			if (newQuery.match(data)) {
 				// Received data is a new request
 				mutex.lock();
 
@@ -140,7 +140,7 @@ public class QueryController {
 
 			// If so add data
 			mutex.lock();
-			currentStringBuilder.append(new String(bytes)).append("\n");
+			currentStringBuilder.append(new String(data)).append("\n");
 			mutex.unlock();
 
 		}
