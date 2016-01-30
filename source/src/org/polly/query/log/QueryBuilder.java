@@ -28,7 +28,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 public class QueryBuilder extends JFrame {

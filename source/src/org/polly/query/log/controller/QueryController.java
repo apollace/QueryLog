@@ -37,7 +37,7 @@ public class QueryController {
 	private IReader reader = new FileReader();
 
 	private final Mutex mutex = new Mutex();
-	private volatile int advancementPecentage = 0;
+	private volatile int advancementPercentage = 0;
 	private StringBuilder matchedLinesFromLastTime = new StringBuilder();
 
 	/**
@@ -60,14 +60,14 @@ public class QueryController {
 
 		@Override
 		public void onProgressChange(int advancementPercentage) {
-			QueryController.this.advancementPecentage = advancementPecentage;
+			QueryController.this.advancementPercentage = advancementPercentage;
 		}
 	}
 
 	private Callback callback = new Callback();
 
 	public boolean search(String query, String url) {
-		advancementPecentage = 0;
+		advancementPercentage = 0;
 		matchedLinesFromLastTime = new StringBuilder();
 
 		// Try to set query
@@ -98,7 +98,7 @@ public class QueryController {
 	}
 
 	public int getAdvancement() {
-		return advancementPecentage;
+		return advancementPercentage;
 	}
 
 }

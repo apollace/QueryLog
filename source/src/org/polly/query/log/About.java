@@ -1,9 +1,7 @@
 package org.polly.query.log;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -15,7 +13,7 @@ import java.awt.Color;
 import javax.swing.JScrollPane;
 
 public class About extends JDialog {
-
+	private static final long serialVersionUID = -5268378363452705371L;
 	private final JPanel contentPanel = new JPanel();
 
 	/**
@@ -58,7 +56,7 @@ public class About extends JDialog {
 			contentPanel.add(scrollPane, BorderLayout.CENTER);
 			{
 				JTextPane txtpnChangelog = new JTextPane();
-				txtpnChangelog.setText("Version 2.0.0\r\n+ New GUI\r\n+ Now a search can follow more than one requet at time\r\nVersion 1.0.0 - Release Date: 2016-01-20\r\n+ First release");
+				txtpnChangelog.setText("Version 2.0.0\r\n+ New GUI\r\n+ Search is performed by a new thread\r\nVersion 1.0.0 - Release Date: 2016-01-20\r\n+ First release");
 				scrollPane.setViewportView(txtpnChangelog);
 			}
 		}
