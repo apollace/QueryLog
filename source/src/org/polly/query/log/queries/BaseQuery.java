@@ -25,6 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class BaseQuery implements IQuery {
+	private StatementType ststementType = IQuery.StatementType.PLAIN;
+
 	private enum Sate {
 		START, CONTINUE, END
 	};
@@ -87,6 +89,7 @@ public class BaseQuery implements IQuery {
 		queryStr = queryStr.trim();
 		if (!queryStr.startsWith("@{")) {
 			// Query is a normal query
+			ststementType = StatementType.PLAIN;
 			if (isRegex(queryStr)) {
 				query.queryRegEx = compileRegEx(queryStr);
 			}
@@ -94,6 +97,7 @@ public class BaseQuery implements IQuery {
 			return true;
 		} else {
 			// Query is an advanced query
+			ststementType = StatementType.START_END_CONTINUE;
 			query.queryStr = null;
 		}
 
@@ -145,6 +149,11 @@ public class BaseQuery implements IQuery {
 		}
 
 		return false;
+	}
+
+	@Override
+	public StatementType getStatementType() {
+		return ststementType;
 	}
 
 	private boolean moveUpContext() {

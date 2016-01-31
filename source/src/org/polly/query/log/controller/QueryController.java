@@ -54,7 +54,7 @@ public class QueryController {
 	 * 
 	 * @author Alessandro Pollace
 	 */
-	private class Callback implements ICallback {
+	private class CallbackStartContinueEnd implements ICallback {
 
 		@Override
 		public void onData(String data, boolean isLast) {
@@ -112,7 +112,7 @@ public class QueryController {
 		}
 	}
 
-	private class CallbackForSimpleStatement implements ICallback {
+	private class CallbackPlain implements ICallback {
 		private static final String DEFAULT_HEADER = "Default";
 
 		@Override
@@ -169,6 +169,14 @@ public class QueryController {
 		newQuery = QueryFactory.getInstance().getQuery();
 		if (!newQuery.setQuery(strQuery)) {
 			return false;
+		}
+		switch (newQuery.getStatementType()) {
+		case PLAIN:
+			callback = new CallbackPlain();
+			break;
+		case START_END_CONTINUE:
+			callback = new CallbackStartContinueEnd();
+			break;
 		}
 
 		// Try to initialize reader

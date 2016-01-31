@@ -33,6 +33,9 @@ package org.polly.query.log.queries;
  * @author Alessandro Pollace
  */
 public interface IQuery {
+	public enum StatementType {
+		PLAIN, START_END_CONTINUE
+	};
 
 	/**
 	 * Store the user query.
@@ -56,4 +59,11 @@ public interface IQuery {
 	 *         otherwise.
 	 */
 	public boolean match(String line);
+
+	/**
+	 * This method return the type of statement set as string query.
+	 * 
+	 * @return an enumerative that represents the statement type.
+	 */
+	public StatementType getStatementType();
 }
