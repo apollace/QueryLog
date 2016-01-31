@@ -28,10 +28,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-
-import org.polly.query.log.QueryLog;
 
 import javax.swing.JPanel;
 import javax.swing.JList;
@@ -41,12 +37,9 @@ import java.awt.FlowLayout;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JTextPane;
-import java.awt.Dimension;
 import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Component;
 import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
