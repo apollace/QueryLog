@@ -164,6 +164,9 @@ public class QueryController {
 	public boolean search(String query, String url) {
 		advancementPercentage = 0;
 
+		queryMapByRequestHeader.clear();
+		resultsMapByRequestHeader.clear();
+
 		// Try to set query
 		strQuery = query;
 		newQuery = QueryFactory.getInstance().getQuery();

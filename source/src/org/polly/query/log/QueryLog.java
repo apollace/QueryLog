@@ -25,9 +25,14 @@ import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultCaret;
 
+import org.polly.query.log.controller.ProjectController;
+import org.polly.query.log.controller.ProjectController.ProjectException;
+import org.polly.query.log.controller.ProjectController.PropertyListener;
 import org.polly.query.log.controller.QueryController;
+import org.polly.query.log.utils.QueryLogProjectFileFilter;
 import org.polly.query.log.widget.JTextPaneNoWrap;
 
 import javax.swing.JScrollPane;
@@ -62,17 +67,20 @@ import java.awt.Dimension;
 import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JSeparator;
 
 public class QueryLog {
-	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
-	JList<String> headers = new JList<String>(headerListModel);
+	private String projectSavedPath = null;
+	private static final ProjectController project = new ProjectController();
 
+	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
+	private JList<String> headers = new JList<String>(headerListModel);
+
+	private JTextPane txtpnQuery = new JTextPane();
 	private JTextPane textPaneResults = new JTextPaneNoWrap();
 	private JFrame frame = null;
 	private JFrame frmQuerylog;
 	private JProgressBar progressBar = new JProgressBar();
-	private String logPath = "";
-	JLabel lblLogPathView = new JLabel("Plase select a log directory via File menu");
 
 	private QueryController queryController = new QueryController();
 
@@ -176,7 +184,6 @@ public class QueryLog {
 		JScrollPane scrollPane_1 = new JScrollPane();
 		queryPanel.add(scrollPane_1);
 
-		final JTextPane txtpnQuery = new JTextPane();
 		txtpnQuery.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		scrollPane_1.setViewportView(txtpnQuery);
 
@@ -188,7 +195,14 @@ public class QueryLog {
 		lblLogPath.setFont(new Font("Tahoma", Font.BOLD, 11));
 		propertyPanel.add(lblLogPath);
 
+		final JLabel lblLogPathView = new JLabel("Plase select a log directory via File menu");
 		propertyPanel.add(lblLogPathView);
+		project.addListener(ProjectController.LOGS_FOLDER, new PropertyListener() {
+			@Override
+			public void onChange(String propertyValue) {
+				lblLogPathView.setText(propertyValue);
+			}
+		});
 
 		JLabel lblAdvancement = new JLabel("Advancement");
 		lblAdvancement.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -202,10 +216,10 @@ public class QueryLog {
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setRightComponent(scrollPane);
 
-		// Disable line wrap 
+		// Disable line wrap
 		DefaultCaret caret = (DefaultCaret) textPaneResults.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-		
+
 		// Set properties of result panel
 		textPaneResults.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		textPaneResults.setEditable(false);
@@ -222,10 +236,8 @@ public class QueryLog {
 		headers.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					String content = queryController.getRequestContent(headers.getSelectedValue());
-					textPaneResults.setText(content);
-				}
+				String content = queryController.getRequestContent(headers.getSelectedValue());
+				textPaneResults.setText(content);
 			}
 		});
 
@@ -241,29 +253,42 @@ public class QueryLog {
 		JMenuItem mntmOpenLogsFolder = new JMenuItem("Open logs folder");
 		mntmOpenLogsFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser fc = new JFileChooser();
-				fc.setDialogTitle("Select your log folder");
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				if (fc.showSaveDialog(QueryLog.this.frame) == JFileChooser.CANCEL_OPTION) {
-					return;
-				}
-				QueryLog.this.logPath = fc.getSelectedFile().getAbsolutePath();
-				lblLogPathView.setText(logPath);
-				setProperty(LAST_USED_LOG_DIR, logPath);
+				menuSetLogFolder();
 			}
 		});
-		mntmOpenLogsFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK));
-		mnFile.add(mntmOpenLogsFolder);
 
-		JMenuItem mntmReloadLastLogs = new JMenuItem("Reload last logs folder");
+		JMenuItem mntmSaveProject = new JMenuItem("Save project");
+		mntmSaveProject.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuSaveProject();
+			}
+		});
+		mntmSaveProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
+		mnFile.add(mntmSaveProject);
+
+		JMenuItem mntmReloadLastLogs = new JMenuItem("Open project");
 		mntmReloadLastLogs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				logPath = getProperty(LAST_USED_LOG_DIR);
-				lblLogPathView.setText(logPath);
+				menuOpenProject();
 			}
 		});
-		mntmReloadLastLogs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_MASK));
+		mntmReloadLastLogs.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
 		mnFile.add(mntmReloadLastLogs);
+
+		JMenuItem mntmSaveProjectAs = new JMenuItem("Save project as");
+		mntmSaveProjectAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				menuSaveProjectAs();
+			}
+		});
+		mntmSaveProjectAs
+				.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK | InputEvent.SHIFT_MASK));
+		mnFile.add(mntmSaveProjectAs);
+
+		JSeparator separator = new JSeparator();
+		mnFile.add(separator);
+		mntmOpenLogsFolder.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_MASK));
+		mnFile.add(mntmOpenLogsFolder);
 
 		JMenu mnQuery = new JMenu("Query");
 		menuBar.add(mnQuery);
@@ -272,7 +297,11 @@ public class QueryLog {
 		mntmRunQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				headerListModel.clear();
-				queryController.search(txtpnQuery.getText(), logPath);
+
+				String query = txtpnQuery.getText();
+				String logFolder = project.getProperty(ProjectController.LOGS_FOLDER);
+
+				queryController.search(query, logFolder);
 				startWaitLoop();
 			}
 		});
@@ -300,4 +329,75 @@ public class QueryLog {
 		menu.add(mntmAbout);
 	}
 
+	private void saveProject() {
+		project.setProperty(ProjectController.QUERY, txtpnQuery.getText());
+		try {
+			project.saveProject(projectSavedPath);
+		} catch (ProjectException e) {
+			// TODO
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void menuSaveProject() {
+		if (projectSavedPath == null) {
+			menuSaveProjectAs();
+		}
+
+		if (!projectSavedPath.endsWith(".qlp"))
+			projectSavedPath = projectSavedPath + ".qlp";
+		saveProject();
+	}
+
+	/**
+	 * 
+	 */
+	private void menuSaveProjectAs() {
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Save project");
+		fc.setFileFilter(new QueryLogProjectFileFilter());
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		if (fc.showSaveDialog(QueryLog.this.frame) == JFileChooser.CANCEL_OPTION) {
+			return;
+		}
+
+		projectSavedPath = fc.getSelectedFile().getAbsolutePath();
+		saveProject();
+	}
+
+	/**
+	 * 
+	 */
+	private void menuOpenProject() {
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Open Project");
+		fc.setFileFilter(new QueryLogProjectFileFilter());
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		if (fc.showOpenDialog(QueryLog.this.frame) == JFileChooser.CANCEL_OPTION) {
+			return;
+		}
+
+		projectSavedPath = fc.getSelectedFile().getAbsolutePath();
+		try {
+			project.openProject(projectSavedPath);
+		} catch (ProjectException e) {
+			// TODO
+			e.printStackTrace();
+		}
+
+		txtpnQuery.setText(project.getProperty(ProjectController.QUERY));
+	}
+
+	private void menuSetLogFolder() {
+		JFileChooser fc = new JFileChooser();
+		fc.setDialogTitle("Select your log folder");
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		if (fc.showSaveDialog(QueryLog.this.frame) == JFileChooser.CANCEL_OPTION) {
+			return;
+		}
+		project.setProperty(ProjectController.LOGS_FOLDER, fc.getSelectedFile().getAbsolutePath());
+	}
 }
