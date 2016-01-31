@@ -58,6 +58,7 @@ import org.polly.query.log.controller.ProjectController.PropertyListener;
 import org.polly.query.log.controller.QueryController;
 import org.polly.query.log.utils.QueryLogProjectFileFilter;
 import org.polly.query.log.widget.JTextPaneNoWrap;
+import org.polly.query.log.widget.QueryWidget;
 
 /**
  * 
@@ -83,10 +84,18 @@ public class QueryLog {
 	}
 
 	/*
+	 * Data
+	 */
+	private String projectSavedPath = null;
+	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
+
+	/*
 	 * UI component required as class attribute
 	 */
 	private JList<String> requestHeadersList = new JList<String>(this.headerListModel);
-	private JTextPane txtpnQuery = new JTextPane();
+
+	private QueryWidget queryWidget = new QueryWidget();
+	private JPanel queryPanel = new JPanel();
 	private JTextPane textPaneResults = new JTextPaneNoWrap();
 	private JFrame frmQuerylog = null;
 	private JProgressBar progressBar = new JProgressBar();
@@ -96,12 +105,6 @@ public class QueryLog {
 	 */
 	private static final ProjectController project = new ProjectController();
 	private QueryController queryController = new QueryController();
-
-	/*
-	 * Data
-	 */
-	private String projectSavedPath = null;
-	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
 
 	/**
 	 * Create the application.
@@ -224,16 +227,10 @@ public class QueryLog {
 	 * @param mainSplitPane
 	 */
 	private void buildQueryPanel(JSplitPane mainSplitPane) {
-		JPanel queryPanel = new JPanel();
-		queryPanel.setBorder(new TitledBorder(null, "Query", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		mainSplitPane.setLeftComponent(queryPanel);
 		queryPanel.setLayout(new BorderLayout(0, 0));
+		queryPanel.add(queryWidget, BorderLayout.CENTER);
 
-		JScrollPane queryEditorScrollPAne = new JScrollPane();
-		queryPanel.add(queryEditorScrollPAne);
-
-		this.txtpnQuery.setFont(new Font("Monospaced", Font.PLAIN, 11));
-		queryEditorScrollPAne.setViewportView(this.txtpnQuery);
+		mainSplitPane.setLeftComponent(queryPanel);
 
 		JPanel propertyPanel = new JPanel();
 		queryPanel.add(propertyPanel, BorderLayout.SOUTH);
@@ -327,7 +324,8 @@ public class QueryLog {
 			e.printStackTrace();
 		}
 
-		this.txtpnQuery.setText(project.getProperty(ProjectController.QUERY));
+		queryWidget.setQuerySaved(project.getProperty(ProjectController.QUERY));
+		queryWidget.setMacroSaved(project.getProperty(ProjectController.MACRO));
 	}
 
 	/**
@@ -336,7 +334,7 @@ public class QueryLog {
 	private void menuRunQuery() {
 		this.headerListModel.clear();
 
-		String query = this.txtpnQuery.getText();
+		String query = queryWidget.getQueryToExecute();
 		String logFolder = project.getProperty(ProjectController.LOGS_FOLDER);
 
 		this.queryController.search(query, logFolder);
@@ -397,7 +395,8 @@ public class QueryLog {
 	 *
 	 */
 	private void saveProject() {
-		project.setProperty(ProjectController.QUERY, this.txtpnQuery.getText());
+		project.setProperty(ProjectController.QUERY, queryWidget.getQueryToSave());
+		project.setProperty(ProjectController.MACRO, queryWidget.getMacroToSave());
 		try {
 			project.saveProject(this.projectSavedPath);
 		} catch (ProjectException e) {

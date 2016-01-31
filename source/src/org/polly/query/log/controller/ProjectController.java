@@ -47,9 +47,10 @@ public class ProjectController {
 	public static final int PROJECT_FORMAT_VERSION = 1;
 
 	public static final String QUERY = "Query";
+	public static final String MACRO = "Macro";
 	public static final String LOGS_FOLDER = "LogFolder";
 
-	private static final Set<String> ADMISSIBLE_KEYS = new HashSet<String>(Arrays.asList(QUERY, LOGS_FOLDER));
+	private static final Set<String> ADMISSIBLE_KEYS = new HashSet<String>(Arrays.asList(QUERY, MACRO, LOGS_FOLDER));
 
 	private Map<String, List<PropertyListener>> listeners = new HashMap<String, List<PropertyListener>>();
 
