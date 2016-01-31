@@ -117,8 +117,10 @@ public class QueryLog {
 	}
 
 	/**
-	 *
-	 * @return
+	 * This method builds the main window structure and return the main split
+	 * panel.
+	 * 
+	 * @return the main split panel
 	 */
 	private JSplitPane buildMainWindowStructure() {
 		this.frmQuerylog = new JFrame();
@@ -133,7 +135,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * This method builds the menu bar and its items.
 	 */
 	private void buildMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
@@ -223,8 +225,10 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * This method builds the query panel.
+	 * 
 	 * @param mainSplitPane
+	 *            The main split panel
 	 */
 	private void buildQueryPanel(JSplitPane mainSplitPane) {
 		queryPanel.setLayout(new BorderLayout(0, 0));
@@ -257,8 +261,11 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * This method builds the result panel composed by results text pane and
+	 * result headers..
+	 * 
 	 * @param mainSplitPane
+	 *            the main split panel
 	 */
 	private void buildResultsPanel(JSplitPane mainSplitPane) {
 		JSplitPane resultsSplitPane = new JSplitPane();
@@ -305,7 +312,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the open project menu item
 	 */
 	private void menuOpenProject() {
 		JFileChooser fc = new JFileChooser();
@@ -329,7 +336,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the run menu item
 	 */
 	private void menuRunQuery() {
 		this.headerListModel.clear();
@@ -342,7 +349,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the save project menu item
 	 */
 	private void menuSaveProject() {
 		if (this.projectSavedPath == null) {
@@ -356,7 +363,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the save as menu item
 	 */
 	private void menuSaveProjectAs() {
 		JFileChooser fc = new JFileChooser();
@@ -372,7 +379,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the set log folder menu item
 	 */
 	private void menuSetLogFolder() {
 		JFileChooser fc = new JFileChooser();
@@ -385,14 +392,14 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * The action behind the stop query menu item
 	 */
 	private void menuStopQuery() {
 		this.queryController.stopSearch();
 	}
 
 	/**
-	 *
+	 * The common section between save and save as menu item
 	 */
 	private void saveProject() {
 		project.setProperty(ProjectController.QUERY, queryWidget.getQueryToSave());
@@ -406,7 +413,7 @@ public class QueryLog {
 	}
 
 	/**
-	 *
+	 * This method update the GUI while {@link QueryController} works.
 	 */
 	private void startWaitLoop() {
 		String headers[] = this.queryController.getRequestsHeader();
