@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.polly.query.log.utils.ErrorManagedThread;
+
 import sun.awt.Mutex;
 
 /**
@@ -95,13 +97,15 @@ public class FileReader implements IReader {
 		mutex.unlock();
 
 		// Start the reading in a new thread
-		new Thread() {
-			public void run() {
+		new ErrorManagedThread() {
+			@Override
+			public void runErrorManaged() throws Exception {
 				mutex.lock();
 				try {
 					threadMain(callback);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					FileReader.this.stop();
+					throw e;
 				}
 				mutex.unlock();
 			};
