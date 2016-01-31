@@ -25,8 +25,10 @@ import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
 import org.polly.query.log.controller.QueryController;
+import org.polly.query.log.widget.JTextPaneNoWrap;
 
 import javax.swing.JScrollPane;
 import javax.swing.DefaultListModel;
@@ -65,7 +67,7 @@ public class QueryLog {
 	private DefaultListModel<String> headerListModel = new DefaultListModel<String>();
 	JList<String> headers = new JList<String>(headerListModel);
 
-	private JTextPane textPaneResults = new JTextPane();
+	private JTextPane textPaneResults = new JTextPaneNoWrap();
 	private JFrame frame = null;
 	private JFrame frmQuerylog;
 	private JProgressBar progressBar = new JProgressBar();
@@ -200,6 +202,11 @@ public class QueryLog {
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setRightComponent(scrollPane);
 
+		// Disable line wrap 
+		DefaultCaret caret = (DefaultCaret) textPaneResults.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
+		// Set properties of result panel
 		textPaneResults.setFont(new Font("Monospaced", Font.PLAIN, 11));
 		textPaneResults.setEditable(false);
 		scrollPane.setViewportView(textPaneResults);
