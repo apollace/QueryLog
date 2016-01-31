@@ -25,7 +25,6 @@ import javax.swing.JSplitPane;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.text.DefaultCaret;
 
 import org.polly.query.log.controller.ProjectController;
@@ -49,13 +48,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
 import java.awt.event.InputEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -84,12 +78,6 @@ public class QueryLog {
 
 	private QueryController queryController = new QueryController();
 
-	private final static String PROP_FILENAME = "QueryLog.settings";
-	private Properties properties = new Properties();
-
-	// Keys used to store properties
-	private final static String LAST_USED_LOG_DIR = "last_sed_log_dir";
-
 	/**
 	 * Launch the application.
 	 */
@@ -114,31 +102,7 @@ public class QueryLog {
 	 * @throws FileNotFoundException
 	 */
 	public QueryLog() throws IOException {
-		try {
-			properties.load(new FileReader(PROP_FILENAME));
-		} catch (FileNotFoundException e) {
-			// It is first start, the file cannot be exist
-		}
 		initialize();
-	}
-
-	private String getProperty(String key) {
-		return properties.getProperty(key);
-	}
-
-	private void setProperty(String key, String property) {
-		properties.setProperty(key, property);
-
-		File f = new File(PROP_FILENAME);
-		OutputStream out;
-		try {
-			out = new FileOutputStream(f);
-			properties.store(out, "Autosaved settings");
-		} catch (FileNotFoundException e) {
-			new ErrorManager(e).setVisible(true);
-		} catch (IOException e) {
-			new ErrorManager(e).setVisible(true);
-		}
 	}
 
 	private void startWaitLoop() {
