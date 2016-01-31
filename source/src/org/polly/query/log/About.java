@@ -74,7 +74,7 @@ public class About extends JDialog {
 			contentPanel.add(scrollPane, BorderLayout.CENTER);
 			{
 				JTextPane txtpnChangelog = new JTextPane();
-				txtpnChangelog.setText("Version 3.0.0 - Release Date: 2016-01-31\r\n+ Now QeryLog follow multiple requests simultaneously\r\n+ Improved error management\r\nVersion 2.0.0 - Release Date: 2016-01-30\r\n+ New GUI\r\n+ Search is performed by a new thread\r\nVersion 1.0.0 - Release Date: 2016-01-20\r\n+ First release");
+				txtpnChangelog.setText("Version 4.0.0 - Release Date: 2016-01-31\r\n+ Added macro\r\nVersion 3.0.0 - Release Date: 2016-01-31\r\n+ Now QeryLog follow multiple requests simultaneously\r\n+ Improved error management\r\nVersion 2.0.0 - Release Date: 2016-01-30\r\n+ New GUI\r\n+ Search is performed by a new thread\r\nVersion 1.0.0 - Release Date: 2016-01-20\r\n+ First release");
 				scrollPane.setViewportView(txtpnChangelog);
 			}
 		}
