@@ -1,5 +1,1 @@
-Welcome to the QueryLog wiki!
-
-QweryLog is the simplest way to found what you are looking for in your application log. It can follow request across multiple threads, follow multiple requests belonging to a single user and a lot of other stuff.
-
-QweryLog uses its own query syntax. It has nothing in common with DB query syntax but it is powerful enough to found what you are searching.
+QueryLog is a log parser designed to find what you are looking for. It allows to simply search the in log folder like other programs or using the regular expression plus it "Follows request" functionality you can follow all the request generated from a specific user or all the steps involved in the management of a single request also when the elaboration jumps among multiple threads.
