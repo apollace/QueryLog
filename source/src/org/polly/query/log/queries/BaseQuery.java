@@ -27,6 +27,16 @@ import java.util.regex.Pattern;
 public class BaseQuery implements IQuery {
 	private StatementType ststementType = IQuery.StatementType.PLAIN;
 
+	// This regular expression is required to identify and extract the
+	// Start/Continue/End statement
+	// Tested with:
+	// ${Start;Continue;End}
+	// ${S\;tart;Continue;End}
+	// ${S\;tart;\$\{Start\;Continue\;End\};End}
+	// ${S\;tart;\$\{Start\;Continue\;End\};E\nd}
+	//
+	private String matchAndExtractStartContinueEndStatement = "(?<!\\\\)\\$(?<!\\\\)\\{(.+?)(?<!\\\\);(.+?)(?<!\\\\);(.+?)(?<!\\\\)\\}";
+
 	private enum Sate {
 		START, CONTINUE, END
 	};
@@ -68,8 +78,10 @@ public class BaseQuery implements IQuery {
 
 	@Override
 	public boolean setQuery(String query) {
+		// Restore a clean state
 		dynamicValuesReturned.clear();
 
+		// Verify if the current query is a Start/Continue/End statement
 		String regexKey = "\\(\\?\\<([0-9a-zA-Z]+)\\>.+?\\)";
 		Pattern rexexPatternKey = Pattern.compile(regexKey);
 		Matcher mKey = rexexPatternKey.matcher(query);
