@@ -43,6 +43,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Dimension;
 
 /**
  * 
@@ -87,6 +88,8 @@ public class QueryWidget extends JPanel {
 		queryPanel.setRightComponent(macrosPanel);
 
 		JScrollPane macrosNameScrollPAnel = new JScrollPane();
+		macrosNameScrollPAnel.setBorder(new TitledBorder(null, "Macros", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		macrosNameScrollPAnel.setPreferredSize(new Dimension(200, 2));
 		macrosPanel.setLeftComponent(macrosNameScrollPAnel);
 		macrosName.addMouseListener(new MouseAdapter() {
 			@Override
@@ -99,11 +102,12 @@ public class QueryWidget extends JPanel {
 		macrosNameScrollPAnel.setViewportView(macrosName);
 
 		JPanel macrosValuePanel = new JPanel();
+		macrosValuePanel.setBorder(new TitledBorder(null, "Macro value", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		macrosPanel.setRightComponent(macrosValuePanel);
 		macrosValuePanel.setLayout(new BorderLayout(0, 0));
 
 		JScrollPane macrosValueScrollPAnel = new JScrollPane();
-		macrosValuePanel.add(macrosValueScrollPAnel, BorderLayout.CENTER);
+		macrosValuePanel.add(macrosValueScrollPAnel, BorderLayout.NORTH);
 
 		macrosValueScrollPAnel.setViewportView(txtpnMacrosValueTextPane);
 
