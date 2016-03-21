@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.polly.query.log.queries.IQuery;
+import org.polly.query.log.queries.IQueryEngine;
 import org.polly.query.log.queries.QueryFactory;
 import org.polly.query.log.reader.FileReader;
 import org.polly.query.log.reader.IReader;
@@ -44,8 +44,8 @@ public class QueryController {
 	private volatile int advancementPercentage = 0;
 
 	private String strQuery = null;
-	private IQuery newQuery = null;
-	private Map<String, IQuery> queryMapByRequestHeader = new HashMap<String, IQuery>();
+	private IQueryEngine newQuery = null;
+	private Map<String, IQueryEngine> queryMapByRequestHeader = new HashMap<String, IQueryEngine>();
 	private Map<String, StringBuilder> resultsMapByRequestHeader = new HashMap<String, StringBuilder>();
 
 	/**
@@ -69,8 +69,7 @@ public class QueryController {
 				currentStringBuilder = new StringBuilder();
 				queryMapByRequestHeader.put(header, newQuery);
 				resultsMapByRequestHeader.put(header, currentStringBuilder);
-				newQuery = QueryFactory.getInstance().getQuery();
-				newQuery.setQuery(strQuery);
+				newQuery = QueryFactory.getInstance().getQuery(strQuery);
 
 				mutex.unlock();
 			} else if (true)/*
@@ -168,11 +167,8 @@ public class QueryController {
 		resultsMapByRequestHeader.clear();
 
 		// Try to set query
-		strQuery = query;
-		newQuery = QueryFactory.getInstance().getQuery();
-		if (!newQuery.setQuery(strQuery)) {
-			return false;
-		}
+		newQuery = QueryFactory.getInstance().getQuery(query);
+		// TODO review the statement check flow 
 		switch (newQuery.getStatementType()) {
 		case PLAIN:
 			callback = new CallbackPlain();
