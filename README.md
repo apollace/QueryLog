@@ -1,4 +1,4 @@
-QueryLog is a log parser designed to find what you are looking for. QueryLog is designed to search in your log folder open one file at a time following the alphabetical order. QueryLog can either find all rows inside your file that match with a specific set of words or use specific built-in functions set. Thanks to QueryLog built-in functions you can follow using:
+QueryLog is a log parser designed to find what you are looking for. QueryLog is designed to search in your log folder open one file at a time following the alphabetical order. QueryLog can either find all rows inside your file that match with a specific set of words or use specific built-in functions set. QueryLog has two kind of built-in functions:
 
   * Single-line functions;
   * Multi-line functions;
